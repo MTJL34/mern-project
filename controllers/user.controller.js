@@ -68,11 +68,11 @@ module.exports.follow = async (req, res) => {
           
       //add to the following list
       await UserModel.findByIdAndUpdate(
-          req.body.isToFollow,
+          req.body.idToFollow,
           { $addToSet: {followers: req.body.idToFollow}},
           {new:true, upsert: true},
       )
-      .then((docs) => res.send(docs))
+      .then((docs) => console.log(''))
       .catch((err) => res.status(400).send({ message: err }));
 
     } catch (err) {
@@ -80,57 +80,33 @@ module.exports.follow = async (req, res) => {
     }
 };
 
-/* module.exports.follow = async (req, res) => {
+module.exports.unfollow = async (req, res) => {
   if (
     !ObjectID.isValid(req.params.id) ||
-    !ObjectID.isValid(req.body.idToFollow)
-  )
+    !ObjectID.isValid(req.body.idToUnfollow)
+    )
     return res.status(400).send("ID unknown : " + req.params.id);
 
   try {
-    // add to the follower list
+    //add to the follower list
     await UserModel.findByIdAndUpdate(
       req.params.id,
-      { $addToSet: { following: req.body.idToFollow } },
-      { new: true, upsert: true },
-      (err, docs) => {
-        if (!err) res.status(201).json(docs);
-        else return res.status(400).jsos(err);
-      }
-    );
-    // add to following list
+      { $pull: {following: req.body.idToUnfollow}},
+      {new:true, upsert: true},
+    )    
+      .then((docs) => res.status(201).json(docs))
+      .catch((err) => res.status(400).send({ message: err }));
+        
+    //add to the following list
     await UserModel.findByIdAndUpdate(
-      req.body.idToFollow,
-      { $addToSet: { followers: req.params.id } },
-      { new: true, upsert: true },
-      (err, docs) => {
-        // if (!err) res.status(201).json(docs);
-        if (err) return res.status(400).jsos(err);
-      }
-    );
+        req.body.idToUnfollow,
+        { $pull: {followers: req.body.idToUnfollow}},
+        {new:true, upsert: true},
+    )
+    .then((docs) => console.log(''))
+    .catch((err) => res.status(400).send({ message: err }));
+
   } catch (err) {
     return res.status(500).json({ message: err });
   }
-}; */
-
-//l'erreure que j'ai :
-
-/* [nodemon] restarting due to changes...
-[nodemon] starting `node server.js`
-C:\wamp64\www\MERN-PROJECT\node_modules\express\lib\router\route.js:202
-        throw new Error(msg);
-        ^
-
-Error: Route.patch() requires a callback function but got a [object Undefined]
-    at Route.<computed> [as patch] (C:\wamp64\www\MERN-PROJECT\node_modules\express\lib\router\route.js:202:15)
-    at Function.proto.<computed> [as patch] (C:\wamp64\www\MERN-PROJECT\node_modules\express\lib\router\index.js:516:19)
-    at Object.<anonymous> (C:\wamp64\www\MERN-PROJECT\routes\user.routes.js:15:8)
-    at Module._compile (node:internal/modules/cjs/loader:1101:14)
-    at Object.Module._extensions..js (node:internal/modules/cjs/loader:1153:10)
-    at Module.load (node:internal/modules/cjs/loader:981:32)
-    at Function.Module._load (node:internal/modules/cjs/loader:822:12)
-    at Module.require (node:internal/modules/cjs/loader:1005:19)
-    at require (node:internal/modules/cjs/helpers:102:18)
-    at Object.<anonymous> (C:\wamp64\www\MERN-PROJECT\server.js:3:20)
-[nodemon] app crashed - waiting for file changes before starting...
- */
+};
