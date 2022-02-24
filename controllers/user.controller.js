@@ -72,7 +72,7 @@ module.exports.follow = async (req, res) => {
           { $addToSet: {followers: req.body.idToFollow}},
           {new:true, upsert: true},
       )
-      .then((docs) => console.log(''))
+      .then((docs) => console.log(docs))
       .catch((err) => res.status(400).send({ message: err }));
 
     } catch (err) {
@@ -103,7 +103,7 @@ module.exports.unfollow = async (req, res) => {
         { $pull: {followers: req.body.idToUnfollow}},
         {new:true, upsert: true},
     )
-    .then((docs) => console.log(''))
+    .then((docs) => console.log(docs))
     .catch((err) => res.status(400).send({ message: err }));
 
   } catch (err) {
